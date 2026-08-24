@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — VU Helping Desk</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{head:['Poppins','sans-serif'],body:['Inter','sans-serif']},colors:{maroon:{DEFAULT:'#7a1030',deep:'#570b22',dark:'#3a0716'},gold:{DEFAULT:'#c19238',light:'#e5c878'},ivory:'#faf7f4',ink:'#26161d'}}}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.12/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>body{font-family:'Inter',sans-serif;background:#faf7f4;color:#26161d}h1,h2,h3,.font-head{font-family:'Poppins',sans-serif}.card{background:#fff;border:1px solid rgba(38,22,29,.08);box-shadow:0 4px 18px rgba(38,22,29,.05)}</style>
+</head>
+<body class="min-h-screen">
+
+<!-- LOGIN (top of page) -->
+<div id="login-screen" class="min-h-screen flex items-start sm:items-center justify-center px-4 pt-14 sm:pt-4">
+  <div class="card rounded-2xl p-8 w-full max-w-sm">
+    <div class="text-center mb-6">
+      <img src="assets/images/vhd-logo.jpg" alt="VHD" class="w-14 h-14 mx-auto rounded-2xl object-contain border border-ink/10 mb-3">
+      <h1 class="font-head font-bold text-xl">Admin Login</h1>
+      <p class="text-xs text-ink/50 mt-1">VU Helping Desk — Content Manager</p>
+    </div>
+    <div class="space-y-3">
+      <input id="login-email" type="email" placeholder="Admin ID (email)" class="w-full px-4 py-3 rounded-xl border border-ink/15 text-sm outline-none focus:border-maroon">
+      <input id="login-pass" type="password" placeholder="Password" class="w-full px-4 py-3 rounded-xl border border-ink/15 text-sm outline-none focus:border-maroon">
+      <button onclick="doLogin()" class="w-full py-3 rounded-xl bg-maroon text-white font-bold text-sm hover:opacity-90">Login</button>
+      <p id="login-error" class="text-xs text-red-600 text-center hidden"></p>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+  <header class="bg-maroon text-white px-5 py-4 flex items-center justify-between sticky top-0 z-10">
+    <h1 class="font-head font-bold text-lg flex items-center gap-2"><img src="assets/images/vhd-logo.jpg" class="w-7 h-7 rounded-lg object-contain bg-white">VU Helping Desk — Admin</h1>
+    <div class="flex items-center gap-3">
+      <span id="who" class="text-xs text-white/70 hidden sm:inline"></span>
+      <button onclick="doLogout()" class="text-xs font-bold bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg"><i class="fa-solid fa-right-from-bracket mr-1"></i>Logout</button>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto p-4 md:p-6 grid md:grid-cols-[220px_1fr] gap-5">
+    <nav id="cat-nav" class="card rounded-xl p-2 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible"></nav>
+    <div class="space-y-5">
+      <div id="add-form-card" class="card rounded-2xl p-5"></div>
+      <div class="card rounded-2xl p-5">
+        <h3 class="font-head font-bold text-sm mb-3 text-ink/70">Existing Entries</h3>
+        <div id="items-list" class="space-y-2 text-sm"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="assets/js/supabase-config.js" defer></script>
+<script src="assets/js/content-categories.js" defer></script>
+<script src="assets/js/admin.js" defer></script>
+</body>
+</html>

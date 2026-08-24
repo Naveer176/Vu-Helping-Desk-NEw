@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VU Helping Desk — Learn • Support • Succeed</title>
+<meta name="description" content="VU Helping Desk — Handouts, Past Papers, Short Lectures, Assignment & GDB solutions, and direct LMS support for Virtual University students.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<script src="https://cdn.tailwindcss.com" defer></script>
+<script>window.tailwind = window.tailwind || {}; tailwind.config={theme:{extend:{fontFamily:{head:['Poppins','sans-serif'],body:['Inter','sans-serif']},colors:{maroon:{DEFAULT:'#7a1030',deep:'#570b22',dark:'#3a0716'},gold:{DEFAULT:'#c19238',light:'#e5c878'},ivory:'#faf7f4',ink:'#26161d'}}}}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.12/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.12/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5.0.12/800.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="assets/css/style.min.css">
+</head>
+<body class="bg-ivory text-ink">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-ink/10">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <img src="assets/images/vhd-logo.jpg" alt="VU Helping Desk Logo" class="w-11 h-11 rounded-xl object-contain bg-white border border-ink/10" width="600" height="600" fetchpriority="high" decoding="async">
+      <div>
+        <h1 class="font-head font-extrabold text-base sm:text-lg text-maroon leading-tight">VU Helping Desk</h1>
+        <p class="text-[10px] sm:text-xs text-gold font-bold tracking-wide -mt-0.5">LEARN • SUPPORT • SUCCEED</p>
+      </div>
+    </div>
+    <a target="_blank" id="hdr-wa-btn" href="#" class="sweep flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-600/20">
+      <i class="fa-brands fa-whatsapp text-base"></i><span class="hidden sm:inline">LMS Help — Chat Now</span><span class="sm:hidden">Chat</span>
+    </a>
+  </div>
+  <!-- TABS -->
+  <nav id="tabs" class="max-w-6xl mx-auto px-2 flex gap-1 overflow-x-auto pb-1 no-scrollbar"></nav>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-6 min-h-[60vh]">
+  <div id="search-row" class="mb-5"></div>
+  <div id="tab-content"></div>
+</main>
+
+<footer class="border-t border-ink/10 mt-10 py-8 text-center text-xs text-ink/40">
+  <img src="assets/images/vhd-logo.jpg" alt="VHD" class="w-10 h-10 mx-auto rounded-lg object-contain mb-3 opacity-80" loading="lazy" decoding="async">
+  <p class="font-bold text-ink/60">VU Helping Desk</p>
+  <p class="mt-1">Learn • Support • Succeed</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<script src="assets/js/site-config.js" defer></script>
+<script src="assets/js/script.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+<script src="assets/js/supabase-config.js" defer></script>
+<script src="assets/js/data-loader.js" defer></script>
+</body>
+</html>
