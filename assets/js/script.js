@@ -15,6 +15,7 @@ const TABS = [
 let ACTIVE_TAB = 'reviews';
 let ASSIGN_SUB = 'files'; // files | copy
 let Q = '';
+let FOLDER_OPEN = {}; // tabKey -> open course code, or null
 
 function initHeader() {
   document.getElementById('hdr-wa-btn').href = waLink('Assalam-o-Alaikum, I need help regarding LMS.');
@@ -26,9 +27,10 @@ function initHeader() {
 function renderAll() {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === ACTIVE_TAB));
   const cfg = TABS.find(t => t.key === ACTIVE_TAB);
+  const showSearch = cfg.search && !FOLDER_OPEN[ACTIVE_TAB];
   const searchRow = document.getElementById('search-row');
-  searchRow.innerHTML = cfg.search ? `<div class="card p-3 flex items-center gap-3"><i class="fa-solid fa-magnifying-glass text-ink/30 ml-1"></i><input id="q-input" value="${Q}" placeholder="Search by course code..." class="w-full bg-transparent outline-none text-sm"></div>` : '';
-  if (cfg.search) document.getElementById('q-input').addEventListener('input', e => { Q = e.target.value; renderList(); });
+  searchRow.innerHTML = showSearch ? `<div class="card p-3 flex items-center gap-3"><i class="fa-solid fa-magnifying-glass text-ink/30 ml-1"></i><input id="q-input" value="${Q}" placeholder="Search by course code..." class="w-full bg-transparent outline-none text-sm"></div>` : '';
+  if (showSearch) document.getElementById('q-input').addEventListener('input', e => { Q = e.target.value; renderList(); });
   renderList();
 }
 
@@ -38,8 +40,8 @@ function renderList() {
   const el = document.getElementById('tab-content');
   const D = window.DATA || {};
   if (ACTIVE_TAB === 'reviews') return renderReviews(el, D.paper_reviews || []);
-  if (ACTIVE_TAB === 'handouts') return renderFiles(el, D.handouts || [], 'Handout', 'fa-book');
-  if (ACTIVE_TAB === 'past_papers') return renderPastPapers(el, D.past_papers || []);
+  if (ACTIVE_TAB === 'handouts') return renderFolderSection(el, groupByCode(D.handouts || []), 'handouts', 'Handout');
+  if (ACTIVE_TAB === 'past_papers') return renderFolderSection(el, pastPapersToGroups(D.past_papers || []), 'past_papers', 'Past Paper');
   if (ACTIVE_TAB === 'lectures') return renderLectures(el, D.short_lectures || []);
   if (ACTIVE_TAB === 'extractor') return renderExtractor(el);
   if (ACTIVE_TAB === 'assignments') return renderAssignments(el, D.assignments || [], D.assignment_copy || []);
@@ -66,30 +68,44 @@ function renderReviews(el, arr) {
     </div>`).join('')}</div>` : emptyState('Abhi koi paper review nahi hai.');
 }
 
-/* ---------- Simple file list (Handouts / Assignment Files) ---------- */
-function renderFiles(el, arr, label, icon) {
-  const items = arr.filter(r => matchQ(r.code));
-  el.innerHTML = items.length ? `<div class="grid sm:grid-cols-2 gap-4">${items.map(r => `
-    <div class="card p-5 flex items-center justify-between gap-3">
-      <div class="min-w-0">
-        <span class="badge">${r.code}</span>
-        <p class="font-head font-bold text-sm text-ink mt-2 truncate">${r.title || label}</p>
-      </div>
-      ${r.file_url ? `<a target="_blank" href="${r.file_url}" class="btn btn-maroon shrink-0"><i class="fa-solid ${icon}"></i> View</a>` : `<a target="_blank" href="${waLink('Please share ' + r.code + ' ' + label + '.')}" class="btn btn-outline shrink-0"><i class="fa-brands fa-whatsapp"></i> Ask</a>`}
-    </div>`).join('')}</div>` : emptyState(`Abhi koi ${label.toLowerCase()} nahi hai.`);
+/* ---------- Folder-style navigation (Handouts / Past Papers / Assignment Files) ---------- */
+function groupByCode(arr) {
+  const map = {};
+  arr.forEach(r => { const c = (r.code || '').toUpperCase(); if (!map[c]) map[c] = { code: c, items: [] }; map[c].items.push({ title: r.title, file_url: r.file_url }); });
+  return Object.values(map);
+}
+function pastPapersToGroups(arr) {
+  return arr.map(r => ({ code: (r.code || '').toUpperCase(), items: (r.files || []).map(f => ({ title: f.name, file_url: f.url })) }));
+}
+
+function renderFolderSection(el, groups, tabKey, label) {
+  groups = groups.filter(g => matchQ(g.code));
+  const open = FOLDER_OPEN[tabKey];
+
+  if (open) {
+    const g = groups.find(x => x.code === open) || { code: open, items: [] };
+    el.innerHTML = `
+      <button id="folder-back-${tabKey}" class="btn btn-outline mb-4"><i class="fa-solid fa-arrow-left"></i> Back to folders</button>
+      <div class="card p-5">
+        <span class="badge mb-3 inline-block"><i class="fa-solid fa-folder-open mr-1"></i> ${g.code} — ${g.items.length} file${g.items.length !== 1 ? 's' : ''}</span>
+        <div class="flex flex-wrap gap-2">
+          ${g.items.length ? g.items.map(it => it.file_url ? `<a target="_blank" href="${it.file_url}" class="btn btn-outline"><i class="fa-solid fa-file-pdf text-red-500"></i> ${it.title || label}</a>` : '').join('') : emptyState('Is folder mein koi file nahi.')}
+        </div>
+      </div>`;
+    document.getElementById('folder-back-' + tabKey).onclick = () => { FOLDER_OPEN[tabKey] = null; renderAll(); };
+    return;
+  }
+
+  el.innerHTML = groups.length ? `<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">${groups.map(g => `
+    <button data-code="${g.code}" class="folder-card-${tabKey} card p-5 flex flex-col items-center gap-2 text-center hover:-translate-y-0.5">
+      <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-gold to-maroon text-white flex items-center justify-center text-2xl"><i class="fa-solid fa-folder"></i></div>
+      <p class="font-head font-extrabold text-sm text-ink">${g.code}</p>
+      <p class="text-[11px] text-ink/40 font-semibold">${g.items.length} file${g.items.length !== 1 ? 's' : ''}</p>
+    </button>`).join('')}</div>` : emptyState(`Abhi koi ${label.toLowerCase()} nahi hai.`);
+  el.querySelectorAll('.folder-card-' + tabKey).forEach(b => b.addEventListener('click', () => { FOLDER_OPEN[tabKey] = b.dataset.code; renderAll(); }));
 }
 
 /* ---------- Past Papers (grouped, multiple files per code) ---------- */
-function renderPastPapers(el, arr) {
-  const items = arr.filter(r => matchQ(r.code));
-  el.innerHTML = items.length ? `<div class="space-y-4">${items.map(r => `
-    <div class="card p-5">
-      <span class="badge mb-3 inline-block"><i class="fa-solid fa-layer-group mr-1"></i> ${r.code} — ${r.files.length} file${r.files.length > 1 ? 's' : ''}</span>
-      <div class="flex flex-wrap gap-2">
-        ${r.files.map(f => `<a target="_blank" href="${f.url}" class="btn btn-outline"><i class="fa-solid fa-file-pdf text-red-500"></i> ${f.name}</a>`).join('')}
-      </div>
-    </div>`).join('')}</div>` : emptyState('Abhi koi past paper nahi hai.');
-}
 
 /* ---------- Short Lectures ---------- */
 function renderLectures(el, arr) {
@@ -110,7 +126,7 @@ function renderAssignments(el, files, copies) {
     </div>
     <div id="asub-area"></div>`;
   const styleTab = () => { document.getElementById('asub-files').className = 'px-4 py-2 rounded-lg text-xs font-extrabold ' + (ASSIGN_SUB === 'files' ? 'bg-maroon text-white' : 'text-ink/60'); document.getElementById('asub-copy').className = 'px-4 py-2 rounded-lg text-xs font-extrabold ' + (ASSIGN_SUB === 'copy' ? 'bg-maroon text-white' : 'text-ink/60'); };
-  const draw = () => { styleTab(); const area = document.getElementById('asub-area'); ASSIGN_SUB === 'files' ? renderFiles(area, files, 'Assignment', 'fa-file-arrow-down') : renderCopyList(area, copies, 'Abhi koi copy-paste solution nahi hai.'); };
+  const draw = () => { styleTab(); const area = document.getElementById('asub-area'); ASSIGN_SUB === 'files' ? renderFolderSection(area, groupByCode(files), 'assignments', 'Assignment') : renderCopyList(area, copies, 'Abhi koi copy-paste solution nahi hai.'); };
   document.getElementById('asub-files').onclick = () => { ASSIGN_SUB = 'files'; draw(); };
   document.getElementById('asub-copy').onclick = () => { ASSIGN_SUB = 'copy'; draw(); };
   draw();
